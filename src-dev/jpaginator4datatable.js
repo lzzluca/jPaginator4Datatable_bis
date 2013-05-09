@@ -164,7 +164,7 @@ jPaginator.prototype.Update = function (oSettings, oPaging, fnCallbackDraw, w) {
  */
 
 jPaginator.prototype._getHTML = function() {
-  return $('<span>').html(  
+  return $('<span></span>').html(
                           '<div id="' + this._ids.M_LEFT + '">First</div>' +
                           '<div id="' + this._ids.O_LEFT + '">Prev</div>' +
                           '<div class="paginator_p_wrap">' +
@@ -249,6 +249,7 @@ $.fn.dataTableExt.oApi.jpag_and_full_fnPagingInfo = function ( oSettings) {
 
 $.fn.dataTableExt.oPagination.jpag_and_full = {
   DATA_STORING_LABEL: "jpag_and_full_jPagDOMRef",
+  nPaginators: 0, // numbers of paginators: by the sDom setting of Datatable, users can set from 0, 1 or more paginators
   fnInit: function (oSettings, nPaging, fnCallbackDraw) {
 
     // as first, the paginator's container is hidden
@@ -259,12 +260,14 @@ $.fn.dataTableExt.oPagination.jpag_and_full = {
 
     if( !$.data(oSettings.nTable, this.DATA_STORING_LABEL) ) {
 
+      this.nPaginators = 1;
       $.data(oSettings.nTable, this.DATA_STORING_LABEL, new jPaginator(oSettings, nPaging, fnCallbackDraw) );
 
     } else {
 
     // full_number init
 
+      this.nPaginators++;
       jQuery.fn.dataTableExt.oPagination.full_numbers.fnInit(oSettings, nPaging, fnCallbackDraw);
 
     }
@@ -302,7 +305,11 @@ $.fn.dataTableExt.oPagination.jpag_and_full = {
       oSettings.aanFeatures.p = [].concat( oSettings.aanFeatures.p[1] );
     }
     try {
-      jQuery.fn.dataTableExt.oPagination.full_numbers.fnUpdate(oSettings, fnCallbackDraw);
+
+       // if the number of paginators setted is only 1, that will be the jPaginator
+       
+       (this.nPaginators > 1) && jQuery.fn.dataTableExt.oPagination.full_numbers.fnUpdate(oSettings, fnCallbackDraw);
+
     } catch(e) {
       showPaginator = false;
     }
